@@ -1,6 +1,6 @@
 <h1 align="center">Scentora</h1>
 
-> **Scentora** is an e-commerce website application for fragrance businesses.
+> **Scentora** is an e-commerce website application for a fragrance business.
 
 ---
 
@@ -31,7 +31,7 @@ Scentora/
     └── src/
         ├── main.jsx
         ├── App.jsx           # Router and root layout
-        ├── index.css         # Tailwind import
+        ├── index.css
         └── pages/
             └── Home.jsx
 ```
