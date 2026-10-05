@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import Home from "./pages/user/Home";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -7,6 +8,7 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </div>
     </BrowserRouter>
