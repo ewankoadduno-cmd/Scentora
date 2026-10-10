@@ -1,0 +1,238 @@
+export const accordColors = {
+  Sweet: "#c87878",
+  Vanilla: "#b87840",
+  Amber: "#a87040",
+  Oud: "#8b6050",
+  Fresh: "#6898a8",
+  Woody: "#8b7460",
+  Floral: "#b07898",
+  Citrus: "#b09030",
+  "Warm Spicy": "#b06848",
+  Fruity: "#b07858",
+  Aquatic: "#5888a0",
+  Powdery: "#9878a8",
+}
+
+export const products = [
+  {
+    id: "afnan-9pm",
+    brand: "Afnan",
+    name: "9PM",
+    category: "Men",
+    size: "100ml",
+    price: 1800,
+    oldPrice: 2200,
+    stock: 18,
+    badge: "Best Seller",
+    family: "Vanilla",
+    image: "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=780&h=980&fit=crop&auto=format",
+    description: "A sweet, warm, attention-grabbing evening fragrance built around apple, vanilla, amber and tonka bean.",
+    notes: {
+      top: ["Apple", "Bergamot", "Cinnamon"],
+      middle: ["Lavender", "Orange Blossom", "Muguet"],
+      base: ["Vanilla", "Tonka Bean", "Amber", "Patchouli"],
+    },
+    accords: [
+      { name: "Sweet", pct: 88 },
+      { name: "Vanilla", pct: 76 },
+      { name: "Amber", pct: 62 },
+    ],
+  },
+  {
+    id: "lattafa-khamrah",
+    brand: "Lattafa",
+    name: "Khamrah",
+    category: "Unisex",
+    size: "100ml",
+    price: 1600,
+    stock: 9,
+    badge: "Trending",
+    family: "Oud",
+    image: "https://images.unsplash.com/photo-1627823569857-4d8581dc62b2?w=780&h=980&fit=crop&auto=format",
+    description: "A warm gourmand fragrance with rich oud, vanilla, spice and amber depth for evenings and cool weather.",
+    notes: {
+      top: ["Cinnamon", "Nutmeg", "Bergamot"],
+      middle: ["Dates", "Praline", "Tuberose"],
+      base: ["Vanilla", "Tonka Bean", "Oud"],
+    },
+    accords: [
+      { name: "Oud", pct: 82 },
+      { name: "Vanilla", pct: 70 },
+      { name: "Warm Spicy", pct: 60 },
+    ],
+  },
+  {
+    id: "armaf-club-de-nuit",
+    brand: "Armaf",
+    name: "Club de Nuit Intense Man",
+    category: "Men",
+    size: "105ml",
+    price: 2200,
+    stock: 14,
+    badge: "Popular",
+    family: "Fresh",
+    image: "https://images.unsplash.com/photo-1615160460524-432433ba1b8f?w=780&h=980&fit=crop&auto=format",
+    description: "Fresh citrus opening with a smoky woody trail, made for confident everyday wear.",
+    notes: {
+      top: ["Lemon", "Pineapple", "Blackcurrant"],
+      middle: ["Birch", "Rose", "Jasmine"],
+      base: ["Musk", "Ambergris", "Vanilla"],
+    },
+    accords: [
+      { name: "Fresh", pct: 80 },
+      { name: "Woody", pct: 65 },
+      { name: "Citrus", pct: 58 },
+    ],
+  },
+  {
+    id: "lattafa-yara",
+    brand: "Lattafa",
+    name: "Yara",
+    category: "Women",
+    size: "100ml",
+    price: 1200,
+    stock: 22,
+    badge: "Great Value",
+    family: "Floral",
+    image: "https://images.unsplash.com/photo-1608721279136-cd41b752fa41?w=780&h=980&fit=crop&auto=format",
+    description: "A soft fruity floral fragrance with creamy sweetness and an easy everyday personality.",
+    notes: {
+      top: ["Orchid", "Heliotrope", "Tangerine"],
+      middle: ["Gourmand Accord", "Tropical Fruits"],
+      base: ["Vanilla", "Musk", "Sandalwood"],
+    },
+    accords: [
+      { name: "Floral", pct: 78 },
+      { name: "Sweet", pct: 70 },
+      { name: "Fruity", pct: 55 },
+    ],
+  },
+  {
+    id: "rasasi-hawas",
+    brand: "Rasasi",
+    name: "Hawas",
+    category: "Men",
+    size: "100ml",
+    price: 2000,
+    stock: 0,
+    badge: null,
+    family: "Fresh",
+    image: "https://images.unsplash.com/photo-1613521076081-2820f9746a2d?w=780&h=980&fit=crop&auto=format",
+    description: "A fresh aquatic fragrance with bright citrus, clean spice, and energetic projection.",
+    notes: {
+      top: ["Apple", "Bergamot", "Cinnamon"],
+      middle: ["Watery Notes", "Plum", "Cardamom"],
+      base: ["Ambergris", "Musk", "Driftwood"],
+    },
+    accords: [
+      { name: "Fresh", pct: 85 },
+      { name: "Aquatic", pct: 72 },
+      { name: "Citrus", pct: 55 },
+    ],
+  },
+  {
+    id: "maison-glacier",
+    brand: "Maison Alhambra",
+    name: "Glacier Ultra",
+    category: "Men",
+    size: "100ml",
+    price: 1400,
+    stock: 11,
+    badge: "New",
+    family: "Fresh",
+    image: "https://images.unsplash.com/photo-1615160460366-2c9a41771b51?w=780&h=980&fit=crop&auto=format",
+    description: "Cool aromatic freshness with a modern clean profile for office and casual wear.",
+    notes: {
+      top: ["Mint", "Lavender", "Bergamot"],
+      middle: ["Geranium", "Sage"],
+      base: ["Cedar", "Amber", "Musk"],
+    },
+    accords: [
+      { name: "Fresh", pct: 80 },
+      { name: "Aquatic", pct: 68 },
+      { name: "Woody", pct: 48 },
+    ],
+  },
+  {
+    id: "baroque-rouge",
+    brand: "Fragrance World",
+    name: "Baroque Rouge 540",
+    category: "Unisex",
+    size: "100ml",
+    price: 1500,
+    stock: 16,
+    badge: "Best Seller",
+    family: "Amber",
+    image: "https://images.unsplash.com/photo-1615160460367-dcccd27e11ad?w=780&h=980&fit=crop&auto=format",
+    description: "An airy amber floral scent with polished sweetness and a memorable trail.",
+    notes: {
+      top: ["Saffron", "Jasmine"],
+      middle: ["Amberwood", "Ambergris"],
+      base: ["Fir Resin", "Cedar"],
+    },
+    accords: [
+      { name: "Floral", pct: 75 },
+      { name: "Woody", pct: 65 },
+      { name: "Amber", pct: 60 },
+    ],
+  },
+  {
+    id: "moonlight-oud",
+    brand: "Maison Alhambra",
+    name: "Moonlight Oud",
+    category: "Unisex",
+    size: "100ml",
+    price: 2100,
+    stock: 7,
+    badge: "Trending",
+    family: "Oud",
+    image: "https://images.unsplash.com/photo-1643797517590-c44cb552ddcc?w=780&h=980&fit=crop&auto=format",
+    description: "Deep oud, amber and spice for a rich evening signature.",
+    notes: {
+      top: ["Rose", "Saffron"],
+      middle: ["Oud", "Patchouli"],
+      base: ["Amber", "Musk", "Leather"],
+    },
+    accords: [
+      { name: "Oud", pct: 85 },
+      { name: "Amber", pct: 68 },
+      { name: "Warm Spicy", pct: 58 },
+    ],
+  },
+]
+
+export const cartItems = [
+  { productId: "afnan-9pm", quantity: 1 },
+  { productId: "lattafa-yara", quantity: 2 },
+]
+
+export const orders = [
+  {
+    id: "SCN-1028",
+    date: "Oct 10, 2026",
+    status: "Pending",
+    paymentStatus: "Awaiting proof",
+    total: 4200,
+    items: ["Afnan 9PM", "Lattafa Yara"],
+  },
+  {
+    id: "SCN-1019",
+    date: "Oct 3, 2026",
+    status: "Delivered",
+    paymentStatus: "Paid",
+    total: 1600,
+    items: ["Lattafa Khamrah"],
+  },
+]
+
+export function formatPeso(amount) {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
+
+export function getProduct(id) {
+  return products.find((product) => product.id === id) ?? products[0]
+}
