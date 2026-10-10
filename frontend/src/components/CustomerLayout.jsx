@@ -16,10 +16,15 @@ const navLinks = [
 export default function CustomerLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user, logout, loading } = useAuth()
   const { count } = useCart()
   const { closeConfirm, confirm, confirmRequest } = useConfirmDialog()
   const showBackBar = location.pathname !== "/"
+  const isAdmin = user?.role === "admin"
+  const showCustomerActions = !loading && !isAdmin
+  const visibleNavLinks = showCustomerActions && user
+    ? [...navLinks, { label: "Orders", to: "/orders" }]
+    : navLinks
 
   async function handleLogout() {
     const confirmed = await confirm({
@@ -40,7 +45,7 @@ export default function CustomerLayout() {
           </NavLink>
 
           <nav className="hidden items-center gap-7 text-[13px] font-semibold text-muted md:flex">
-            {navLinks.map((link) => (
+            {visibleNavLinks.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -55,28 +60,43 @@ export default function CustomerLayout() {
             <NavLink to="/shop" className="rounded-[3px] p-2 text-muted transition-colors hover:text-ink" aria-label="Search">
               <SearchIcon />
             </NavLink>
-            <NavLink to="/cart" className="relative rounded-[3px] p-2 text-muted transition-colors hover:text-ink" aria-label="Cart">
-              <CartIcon />
-              {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-bronze px-1 text-[10px] font-bold text-cream">
-                  {count}
-                </span>
-              )}
-            </NavLink>
-            <NavLink to={user ? "/account" : "/login"} className="hidden rounded-[3px] p-2 text-muted transition-colors hover:text-ink sm:block" aria-label="Account">
-              <UserIcon />
-            </NavLink>
-            {user ? (
-              <button
-                onClick={handleLogout}
-                className="hidden h-9 w-[86px] items-center justify-center rounded-[3px] bg-ink px-4 text-[12.5px] font-bold text-cream transition-colors hover:bg-ink-soft sm:inline-flex"
-              >
-                Logout
-              </button>
-            ) : (
-              <NavLink to="/login" className="hidden h-9 w-[86px] items-center justify-center rounded-[3px] bg-ink px-4 text-[12.5px] font-bold text-cream transition-colors hover:bg-ink-soft sm:inline-flex">
-                Login
+            {showCustomerActions && (
+              <NavLink to="/cart" className="relative rounded-[3px] p-2 text-muted transition-colors hover:text-ink" aria-label="Cart">
+                <CartIcon />
+                {count > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-bronze px-1 text-[10px] font-bold text-cream">
+                    {count}
+                  </span>
+                )}
               </NavLink>
+            )}
+            {showCustomerActions && user && (
+              <NavLink to="/orders" className="hidden h-9 w-[86px] items-center justify-center rounded-[3px] border border-border bg-cream px-4 text-[12.5px] font-bold text-ink transition-colors hover:border-bronze hover:text-bronze sm:inline-flex">
+                Orders
+              </NavLink>
+            )}
+            {!loading && (
+              <NavLink to={isAdmin ? "/admin" : user ? "/account" : "/login"} className="hidden rounded-[3px] p-2 text-muted transition-colors hover:text-ink sm:block" aria-label={isAdmin ? "Admin dashboard" : "Account"}>
+                <UserIcon />
+              </NavLink>
+            )}
+            {!loading && (
+              isAdmin ? (
+                <NavLink to="/admin" className="hidden h-9 w-[86px] items-center justify-center rounded-[3px] bg-ink px-4 text-[12.5px] font-bold text-cream transition-colors hover:bg-ink-soft sm:inline-flex">
+                  Admin
+                </NavLink>
+              ) : user ? (
+                <button
+                  onClick={handleLogout}
+                  className="hidden h-9 w-[86px] items-center justify-center rounded-[3px] bg-ink px-4 text-[12.5px] font-bold text-cream transition-colors hover:bg-ink-soft sm:inline-flex"
+                >
+                  Logout
+                </button>
+              ) : (
+                <NavLink to="/login" className="hidden h-9 w-[86px] items-center justify-center rounded-[3px] bg-ink px-4 text-[12.5px] font-bold text-cream transition-colors hover:bg-ink-soft sm:inline-flex">
+                  Login
+                </NavLink>
+              )
             )}
           </div>
         </div>

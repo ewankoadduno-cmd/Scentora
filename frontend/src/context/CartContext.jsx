@@ -18,9 +18,13 @@ export function CartProvider({ children }) {
 
   function addItem(product, quantity = 1) {
     setItems((current) => {
+      const availableStock = Number(product.stock ?? 0)
+      const requestedQuantity = Math.max(1, quantity)
       const existing = current.find((item) => item.productId === product.id)
       if (existing) {
-        return current.map((item) => item.productId === product.id ? { ...item, quantity: item.quantity + quantity } : item)
+        return current.map((item) => item.productId === product.id
+          ? { ...item, stock: availableStock, quantity: Math.min(availableStock, item.quantity + requestedQuantity) }
+          : item)
       }
 
       return [
@@ -33,7 +37,8 @@ export function CartProvider({ children }) {
           size: product.size,
           category: product.category,
           price: product.price,
-          quantity,
+          stock: availableStock,
+          quantity: Math.min(availableStock, requestedQuantity),
         },
       ]
     })
@@ -41,7 +46,11 @@ export function CartProvider({ children }) {
 
   function updateQuantity(productId, quantity) {
     setItems((current) => current
-      .map((item) => item.productId === productId ? { ...item, quantity: Math.max(1, quantity) } : item)
+      .map((item) => {
+        if (item.productId !== productId) return item
+        const maxQuantity = Number(item.stock) > 0 ? Number(item.stock) : Number.POSITIVE_INFINITY
+        return { ...item, quantity: Math.min(maxQuantity, Math.max(1, quantity)) }
+      })
     )
   }
 

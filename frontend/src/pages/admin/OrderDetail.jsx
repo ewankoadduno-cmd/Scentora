@@ -9,11 +9,13 @@ import { useOrder } from "../../hooks/useOrders"
 
 export default function OrderDetail() {
   const { orderId } = useParams()
-  const { token } = useAuth()
+  const { token, loading: authLoading } = useAuth()
   const { order, loading, error, setOrder } = useOrder(orderId, token)
   const { closeConfirm, confirm, confirmRequest } = useConfirmDialog()
 
   async function handleUpdate(payload) {
+    if (!order) return
+
     const field = payload.status ? "order status" : "payment status"
     const nextValue = payload.status || payload.paymentStatus
     const currentValue = payload.status ? order.status : order.paymentStatus
@@ -36,7 +38,7 @@ export default function OrderDetail() {
     }
   }
 
-  if (loading) {
+  if (authLoading || loading || !token) {
     return (
       <AdminLayout eyebrow="Order Review" title="Loading...">
         <p className="text-[14px] font-semibold text-muted">Loading order details...</p>

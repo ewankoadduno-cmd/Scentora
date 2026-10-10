@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
 
-export default function ProtectedRoute({ children, requiredRole = null }) {
+export default function ProtectedRoute({ children, requiredRole = null, blockedRole = null, allowGuest = false }) {
   const { user, loading } = useAuth()
   const location = useLocation()
 
@@ -13,11 +13,15 @@ export default function ProtectedRoute({ children, requiredRole = null }) {
     )
   }
 
-  if (!user) {
+  if (!user && !allowGuest) {
     return <Navigate to="/login" replace state={{ from: location }} />
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (blockedRole && user?.role === blockedRole) {
+    return <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />
+  }
+
+  if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to={user.role === "admin" ? "/admin" : "/"} replace />
   }
 

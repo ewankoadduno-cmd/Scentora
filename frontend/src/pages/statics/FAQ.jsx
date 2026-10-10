@@ -1,7 +1,7 @@
 import { StaticPage } from "./AboutUs"
 
 const faqs = [
-  ["Do I need an account to checkout?", "For the MVP, checkout is designed for registered users so orders can be tracked under My Orders."],
+  ["Do I need an account to checkout?", "Yes, checkout is available for registered users so orders can be tracked under My Orders."],
   ["Can I cancel an order?", "Yes, orders can be cancelled while the status is still Pending."],
   ["How do I send payment proof?", "Use the Upload Payment Proof action on the order details page for online transfer payments."],
 ]

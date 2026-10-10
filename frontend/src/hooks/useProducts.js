@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import { fetchProduct, fetchProducts, getFallbackProductById, getFallbackProducts } from "../api/products"
 
 export function useProducts(params = {}) {
-  const { category, family, search, sort } = params
+  const { category, family, maxPrice, minPrice, search, size, sort } = params
   const [items, setItems] = useState(getFallbackProducts())
   const [loading, setLoading] = useState(true)
   const [source, setSource] = useState("fallback")
@@ -10,7 +10,7 @@ export function useProducts(params = {}) {
   const refetch = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await fetchProducts({ category, family, search, sort })
+      const data = await fetchProducts({ category, family, maxPrice, minPrice, search, size, sort })
       setItems(data)
       setSource("database")
     } catch {
@@ -19,7 +19,7 @@ export function useProducts(params = {}) {
     } finally {
       setLoading(false)
     }
-  }, [category, family, search, sort])
+  }, [category, family, maxPrice, minPrice, search, size, sort])
 
   useEffect(() => {
     let active = true
@@ -27,7 +27,7 @@ export function useProducts(params = {}) {
     async function load() {
       try {
         setLoading(true)
-        const data = await fetchProducts({ category, family, search, sort })
+        const data = await fetchProducts({ category, family, maxPrice, minPrice, search, size, sort })
         if (!active) return
         setItems(data)
         setSource("database")
@@ -45,7 +45,7 @@ export function useProducts(params = {}) {
     return () => {
       active = false
     }
-  }, [category, family, refetch, search, sort])
+  }, [category, family, maxPrice, minPrice, refetch, search, size, sort])
 
   return { products: items, loading, source, refetch }
 }

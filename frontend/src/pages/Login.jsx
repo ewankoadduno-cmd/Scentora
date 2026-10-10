@@ -1,11 +1,13 @@
 import { useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
+import { useCart } from "../hooks/useCart"
 
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
+  const { clearCart } = useCart()
   const [form, setForm] = useState({ email: "", password: "" })
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
@@ -17,6 +19,7 @@ export default function Login() {
 
     try {
       const user = await login(form)
+      if (user.role === "admin") clearCart()
       const fallback = user.role === "admin" ? "/admin" : "/account"
       navigate(location.state?.from?.pathname || fallback, { replace: true })
     } catch (err) {

@@ -21,6 +21,10 @@ function slugify(value) {
     .replace(/(^-|-$)/g, "")
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
 function productPayload(body) {
   const slug = body.slug || slugify(`${body.brand || ""} ${body.name || ""}`)
 
@@ -64,17 +68,30 @@ function validateProductPayload(payload) {
 
 router.get("/", async (req, res, next) => {
   try {
-    const { search, category, family, sort = "newest" } = req.query
+    const { search, category, family, size, minPrice, maxPrice, sort = "newest" } = req.query
     const filter = { isActive: true }
 
     if (category) filter.category = category
     if (family) filter.family = family
+    if (size) filter.size = size
+    if (minPrice || maxPrice) {
+      filter.price = {}
+      if (minPrice) filter.price.$gte = Number(minPrice)
+      if (maxPrice) filter.price.$lte = Number(maxPrice)
+    }
     if (search) {
+      const pattern = new RegExp(escapeRegExp(search), "i")
       filter.$or = [
-        { name: new RegExp(search, "i") },
-        { brand: new RegExp(search, "i") },
-        { family: new RegExp(search, "i") },
-        { description: new RegExp(search, "i") },
+        { name: pattern },
+        { brand: pattern },
+        { category: pattern },
+        { family: pattern },
+        { size: pattern },
+        { description: pattern },
+        { "notes.top": pattern },
+        { "notes.middle": pattern },
+        { "notes.base": pattern },
+        { "accords.name": pattern },
       ]
     }
 
@@ -161,14 +178,10 @@ router.patch("/:slug/stock", requireAuth, requireRole("admin"), async (req, res,
 
 router.delete("/:slug", requireAuth, requireRole("admin"), async (req, res, next) => {
   try {
-    const product = await Product.findOneAndUpdate(
-      { slug: req.params.slug },
-      { isActive: false },
-      { new: true }
-    )
+    const product = await Product.findOneAndDelete({ slug: req.params.slug })
 
     if (!product) return res.status(404).json({ message: "Product not found" })
-    res.json({ message: "Product deactivated", product: serializeProduct(product) })
+    res.json({ message: "Product deleted", product: serializeProduct(product) })
   } catch (error) {
     next(error)
   }

@@ -31,12 +31,12 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<ProductListing />} />
           <Route path="/products/:productId" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/cart" element={<ProtectedRoute blockedRole="admin" allowGuest><Cart /></ProtectedRoute>} />
+          <Route path="/checkout" element={<ProtectedRoute requiredRole="customer"><Checkout /></ProtectedRoute>} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          <Route path="/account" element={<ProtectedRoute><MyAccount /></ProtectedRoute>} />
-          <Route path="/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-          <Route path="/orders/:orderId" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
+          <Route path="/account" element={<ProtectedRoute requiredRole="customer"><MyAccount /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute requiredRole="customer"><MyOrders /></ProtectedRoute>} />
+          <Route path="/orders/:orderId" element={<ProtectedRoute requiredRole="customer"><OrderDetails /></ProtectedRoute>} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/shipping-return" element={<ShippingReturn />} />

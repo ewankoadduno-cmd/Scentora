@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
-import { fetchCurrentUser, loginUser, registerUser } from "../api/auth"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { fetchCurrentUser, loginUser, registerUser, updateCurrentUser } from "../api/auth"
 import { AuthContext } from "./auth"
 const TOKEN_KEY = "scentora_token"
 
@@ -62,6 +62,12 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
+  const updateProfile = useCallback(async (payload) => {
+    const data = await updateCurrentUser(payload, token)
+    setUser(data.user)
+    return data.user
+  }, [token])
+
   const value = useMemo(() => ({
     token,
     user,
@@ -70,7 +76,8 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-  }), [token, user, loading])
+    updateProfile,
+  }), [token, user, loading, updateProfile])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

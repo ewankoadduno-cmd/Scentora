@@ -4,17 +4,24 @@ import ProductCard from "../../components/ProductCard"
 import { ArrowRight } from "../../components/Icons"
 import { accordColors, formatPeso, products as fallbackProducts } from "../../data/catalog"
 import { useCart } from "../../hooks/useCart"
+import { useAuth } from "../../hooks/useAuth"
 import { useProduct } from "../../hooks/useProducts"
 
 export default function ProductDetail() {
   const { productId } = useParams()
   const navigate = useNavigate()
   const { addItem } = useCart()
+  const { user, loading: authLoading } = useAuth()
   const { product } = useProduct(productId)
   const [quantity, setQuantity] = useState(1)
+  const isAdmin = user?.role === "admin"
+  const isOutOfStock = product.stock <= 0
+  const maxQuantity = Math.max(1, product.stock)
+  const selectedQuantity = isOutOfStock ? 0 : Math.min(quantity, maxQuantity)
 
   function handleAddToCart(goToCart = true) {
-    addItem(product, quantity)
+    if (isAdmin || isOutOfStock) return
+    addItem(product, selectedQuantity)
     if (goToCart) navigate("/cart")
   }
 
@@ -69,24 +76,64 @@ export default function ProductDetail() {
             <p className="mt-1 font-display text-[32px]">{formatPeso(product.price)}</p>
           </div>
 
-          <div className="mt-7 grid gap-4 sm:grid-cols-[160px_1fr]">
-            <div>
-              <label className="mb-2 block text-[12px] font-bold text-muted">Quantity</label>
-              <div className="flex h-11 overflow-hidden rounded-[4px] border border-border">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-11 bg-parchment text-lg">-</button>
-                <span className="flex flex-1 items-center justify-center text-[14px] font-bold">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="w-11 bg-parchment text-lg">+</button>
+          {authLoading ? (
+            <div className="mt-7 rounded-[5px] border border-border bg-parchment p-5">
+              <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-bronze">Checking Account</p>
+              <p className="mt-2 text-[14px] leading-7 text-muted">
+                Purchase controls will appear after your account role is verified.
+              </p>
+            </div>
+          ) : isAdmin ? (
+            <div className="mt-7 rounded-[5px] border border-border bg-parchment p-5">
+              <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-bronze">Admin View</p>
+              <p className="mt-2 text-[14px] leading-7 text-muted">
+                Admin accounts can review storefront pages, but purchasing actions are disabled. Use the admin console to manage this product or update stock.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link to="/admin/products" className="rounded-[3px] bg-ink px-5 py-3 text-[13px] font-bold text-cream">Manage Product</Link>
+                <Link to="/admin/inventory" className="rounded-[3px] border border-border px-5 py-3 text-[13px] font-bold text-ink">Update Stock</Link>
               </div>
             </div>
-            <div className="flex items-end gap-3">
-              <button onClick={() => handleAddToCart(true)} className="flex flex-1 items-center justify-center gap-2 rounded-[3px] bg-bronze px-6 py-3 text-[13.5px] font-bold text-cream transition-colors hover:bg-bronze-light">
-                Add to Cart <ArrowRight />
-              </button>
-              <button onClick={() => { handleAddToCart(false); navigate("/checkout") }} className="rounded-[3px] border border-border px-6 py-3 text-[13.5px] font-bold text-ink transition-colors hover:bg-parchment">
-                Buy Now
-              </button>
+          ) : (
+            <div className="mt-7 grid gap-4 sm:grid-cols-[160px_1fr]">
+              <div>
+                <label className="mb-2 block text-[12px] font-bold text-muted">Quantity</label>
+                <div className="flex h-11 overflow-hidden rounded-[4px] border border-border">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={isOutOfStock}
+                    className="w-11 bg-parchment text-lg disabled:cursor-not-allowed disabled:opacity-45"
+                  >
+                    -
+                  </button>
+                  <span className="flex flex-1 items-center justify-center text-[14px] font-bold">{selectedQuantity}</span>
+                  <button
+                    onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
+                    disabled={isOutOfStock || quantity >= product.stock}
+                    className="w-11 bg-parchment text-lg disabled:cursor-not-allowed disabled:opacity-45"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-end gap-3">
+                <button
+                  onClick={() => handleAddToCart(true)}
+                  disabled={isOutOfStock}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-[3px] bg-bronze px-6 py-3 text-[13.5px] font-bold text-cream transition-colors hover:bg-bronze-light disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isOutOfStock ? "Out of Stock" : "Add to Cart"} {!isOutOfStock && <ArrowRight />}
+                </button>
+                <button
+                  onClick={() => { handleAddToCart(false); navigate("/checkout") }}
+                  disabled={isOutOfStock}
+                  className="rounded-[3px] border border-border px-6 py-3 text-[13.5px] font-bold text-ink transition-colors hover:bg-parchment disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Buy Now
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 

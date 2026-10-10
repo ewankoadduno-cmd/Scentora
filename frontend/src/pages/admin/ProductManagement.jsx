@@ -29,7 +29,7 @@ const emptyProduct = {
 
 export default function ProductManagement() {
   const { token } = useAuth()
-  const { products, source, refetch } = useProducts()
+  const { products, refetch } = useProducts()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingSlug, setEditingSlug] = useState(null)
   const [form, setForm] = useState(emptyProduct)
@@ -121,9 +121,9 @@ export default function ProductManagement() {
 
   async function handleDelete(product) {
     const confirmed = await confirm({
-      title: "Deactivate this product?",
-      message: `${product.brand} ${product.name} will no longer appear in the shop. Existing orders will keep their saved item details.`,
-      confirmLabel: "Deactivate Product",
+      title: "Delete this product?",
+      message: `${product.brand} ${product.name} will be permanently deleted from MongoDB. Existing orders will keep their saved item details.`,
+      confirmLabel: "Delete Product",
       tone: "danger",
     })
 
@@ -141,7 +141,7 @@ export default function ProductManagement() {
     <AdminLayout eyebrow="Catalog" title="Products Management">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
         <p className="text-[13px] text-muted">
-          Manage product records, prices, stock, and visibility. Data source: {source === "database" ? "MongoDB" : "fallback catalog"}.
+          Manage product records, prices, stock, and visibility.
         </p>
         <button onClick={openAddModal} className="rounded-[3px] bg-ink px-5 py-3 text-[13px] font-bold text-cream">
           Add Product

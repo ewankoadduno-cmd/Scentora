@@ -106,7 +106,7 @@ export default function Home() {
 
       <section className="bg-ink-soft py-20">
         <div className="container-page text-center">
-          <p className="eyebrow mb-4">MVP Ecommerce</p>
+          <p className="eyebrow mb-4">Online Shopping</p>
           <h2 className="heading-display mx-auto max-w-[760px] text-[42px] text-cream md:text-[56px]">
             Browse, add to cart, checkout, and track your order.
           </h2>

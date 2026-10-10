@@ -6,20 +6,45 @@ import { useProducts } from "../../hooks/useProducts"
 const categories = ["Men", "Women", "Unisex"]
 const families = ["Fresh", "Citrus", "Woody", "Amber", "Vanilla", "Oud", "Floral"]
 const sizes = ["50ml", "100ml", "105ml"]
+const priceRanges = [
+  { label: "Under ₱1,500", min: "", max: "1499" },
+  { label: "₱1,500 - ₱2,000", min: "1500", max: "2000" },
+  { label: "Above ₱2,000", min: "2001", max: "" },
+]
 
 export default function ProductListing() {
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("")
   const [family, setFamily] = useState("")
+  const [size, setSize] = useState("")
+  const [priceRange, setPriceRange] = useState("")
   const [sort, setSort] = useState("newest")
-  const { products, loading, source } = useProducts({ search, category, family, sort })
+  const selectedPriceRange = priceRanges.find((range) => range.label === priceRange)
+  const { products, loading } = useProducts({
+    search,
+    category,
+    family,
+    size,
+    minPrice: selectedPriceRange?.min,
+    maxPrice: selectedPriceRange?.max,
+    sort,
+  })
 
   const filtered = useMemo(() => {
     return products
       .filter((product) => !category || product.category === category)
       .filter((product) => !family || product.family === family)
+      .filter((product) => !size || product.size === size)
       .filter((product) => {
-        const haystack = `${product.brand} ${product.name} ${product.family}`.toLowerCase()
+        if (!selectedPriceRange) return true
+        const min = selectedPriceRange.min ? Number(selectedPriceRange.min) : Number.NEGATIVE_INFINITY
+        const max = selectedPriceRange.max ? Number(selectedPriceRange.max) : Number.POSITIVE_INFINITY
+        return product.price >= min && product.price <= max
+      })
+      .filter((product) => {
+        const notes = Object.values(product.notes ?? {}).flat().join(" ")
+        const accords = product.accords?.map((accord) => accord.name).join(" ") ?? ""
+        const haystack = `${product.brand} ${product.name} ${product.category} ${product.family} ${product.size} ${product.description} ${notes} ${accords}`.toLowerCase()
         return haystack.includes(search.toLowerCase())
       })
       .sort((a, b) => {
@@ -27,7 +52,17 @@ export default function ProductListing() {
         if (sort === "price-high") return b.price - a.price
         return b.id.localeCompare(a.id)
       })
-  }, [category, family, products, search, sort])
+  }, [category, family, products, search, selectedPriceRange, size, sort])
+
+  const hasFilters = Boolean(search || category || family || size || priceRange)
+
+  function clearFilters() {
+    setSearch("")
+    setCategory("")
+    setFamily("")
+    setSize("")
+    setPriceRange("")
+  }
 
   return (
     <main className="min-h-screen bg-cream">
@@ -56,13 +91,19 @@ export default function ProductListing() {
             <div className="sticky top-[86px]">
               <FilterGroup title="Category" items={categories} value={category} setValue={setCategory} />
               <FilterGroup title="Fragrance Family" items={families} value={family} setValue={setFamily} />
-              <FilterGroup title="Size" items={sizes} value="" setValue={() => {}} />
+              <FilterGroup title="Size" items={sizes} value={size} setValue={setSize} />
+              <FilterGroup title="Price Range" items={priceRanges.map((range) => range.label)} value={priceRange} setValue={setPriceRange} />
               <div className="border-t border-border-faint pt-6">
                 <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-faint">Price Range</p>
                 <div className="rounded-[5px] border border-border bg-parchment px-4 py-3 text-[12.5px] text-muted">
-                  ₱1,000 - ₱3,000
+                  {priceRange || "All prices"}
                 </div>
               </div>
+              {hasFilters && (
+                <button onClick={clearFilters} className="mt-5 w-full rounded-[3px] border border-border px-4 py-3 text-[12px] font-bold text-ink transition-colors hover:bg-cream">
+                  Clear Filters
+                </button>
+              )}
             </div>
           </aside>
 
@@ -70,7 +111,7 @@ export default function ProductListing() {
             <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
               <p className="text-[13px] text-muted">
                 <span className="font-bold text-ink">{filtered.length}</span> products found
-                <span className="ml-2 text-[11px] text-faint">{loading ? "Loading..." : source === "database" ? "from MongoDB" : "fallback data"}</span>
+                {loading && <span className="ml-2 text-[11px] text-faint">Loading...</span>}
               </p>
               <select
                 value={sort}
@@ -82,9 +123,17 @@ export default function ProductListing() {
                 <option value="price-high">Price high to low</option>
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-              {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
-            </div>
+            {filtered.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
+              </div>
+            ) : (
+              <section className="rounded-[6px] border border-border bg-parchment p-8 text-center">
+                <h2 className="font-display text-[32px]">No fragrances found.</h2>
+                <p className="mx-auto mt-3 max-w-[420px] text-[14px] leading-7 text-muted">Try another search term or clear your filters.</p>
+                <button onClick={clearFilters} className="mt-6 rounded-[3px] bg-ink px-6 py-3 text-[13px] font-bold text-cream">Clear Filters</button>
+              </section>
+            )}
           </div>
         </div>
       </section>

@@ -85,4 +85,28 @@ router.get("/me", requireAuth, (req, res) => {
   res.json({ user: sanitizeUser(req.user) })
 })
 
+router.patch("/me", requireAuth, async (req, res, next) => {
+  try {
+    const { name, contactNumber, address = {} } = req.body || {}
+
+    if (!name?.trim()) {
+      return res.status(400).json({ message: "Name is required" })
+    }
+
+    req.user.name = name.trim()
+    req.user.contactNumber = contactNumber?.trim() || ""
+    req.user.address = {
+      street: address.street?.trim() || "",
+      city: address.city?.trim() || "",
+      province: address.province?.trim() || "",
+    }
+
+    await req.user.save()
+
+    res.json({ user: sanitizeUser(req.user) })
+  } catch (error) {
+    next(error)
+  }
+})
+
 module.exports = router
