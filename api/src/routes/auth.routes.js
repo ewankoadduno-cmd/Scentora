@@ -25,6 +25,15 @@ function signToken(user) {
   )
 }
 
+function getPasswordError(password) {
+  if (password.length < 8) return "Password must be at least 8 characters"
+  if (!/[a-z]/.test(password)) return "Password must include a lowercase letter"
+  if (!/[A-Z]/.test(password)) return "Password must include an uppercase letter"
+  if (!/\d/.test(password)) return "Password must include a number"
+  if (!/[^A-Za-z0-9]/.test(password)) return "Password must include a special character"
+  return ""
+}
+
 router.post("/register", async (req, res, next) => {
   try {
     const { name, email, contactNumber = "", password } = req.body
@@ -33,8 +42,9 @@ router.post("/register", async (req, res, next) => {
       return res.status(400).json({ message: "Name, email, and password are required" })
     }
 
-    if (password.length < 8) {
-      return res.status(400).json({ message: "Password must be at least 8 characters" })
+    const passwordError = getPasswordError(password)
+    if (passwordError) {
+      return res.status(400).json({ message: passwordError })
     }
 
     const existing = await User.findOne({ email })

@@ -2,7 +2,7 @@ import { useState } from "react"
 import AdminLayout, { AdminTable, StatusPill } from "../../components/AdminLayout"
 import ConfirmDialog from "../../components/ConfirmDialog"
 import { createProduct, deleteProduct, updateProduct } from "../../api/products"
-import { formatPeso } from "../../data/catalog"
+import { accordColors, formatPeso } from "../../data/catalog"
 import { useAuth } from "../../hooks/useAuth"
 import { useConfirmDialog } from "../../hooks/useConfirmDialog"
 import { useProducts } from "../../hooks/useProducts"
@@ -25,6 +25,7 @@ const emptyProduct = {
   notesTop: "",
   notesMiddle: "",
   notesBase: "",
+  accords: [],
 }
 
 export default function ProductManagement() {
@@ -62,6 +63,11 @@ export default function ProductManagement() {
       notesTop: product.notes?.top?.join(", ") || "",
       notesMiddle: product.notes?.middle?.join(", ") || "",
       notesBase: product.notes?.base?.join(", ") || "",
+      accords: (product.accords || []).map((accord) => ({
+        id: crypto.randomUUID(),
+        name: accord.name,
+        pct: String(accord.pct),
+      })),
     })
     setError("")
     setModalOpen(true)
@@ -70,6 +76,15 @@ export default function ProductManagement() {
   async function handleSubmit(event) {
     event.preventDefault()
     setError("")
+
+    const invalidAccord = form.accords.some((accord) => (
+      !accord.name.trim() || accord.pct.trim() === "" ||
+      !Number.isFinite(Number(accord.pct)) || Number(accord.pct) < 0 || Number(accord.pct) > 100
+    ))
+    if (invalidAccord) {
+      setError("Each accord needs a name and a percentage from 0 to 100.")
+      return
+    }
 
     const confirmed = await confirm({
       title: editingSlug ? "Save product changes?" : "Create this product?",
@@ -101,6 +116,10 @@ export default function ProductManagement() {
         middle: splitList(form.notesMiddle),
         base: splitList(form.notesBase),
       },
+      accords: form.accords.map((accord) => ({
+        name: Object.keys(accordColors).find((name) => name.toLowerCase() === accord.name.trim().toLowerCase()) || accord.name.trim(),
+        pct: Number(accord.pct),
+      })),
     }
 
     try {
@@ -237,6 +256,24 @@ function ProductModal({ editing, form, setForm, error, submitting, onClose, onSu
           <Field label="Base Notes" value={form.notesBase} onChange={(notesBase) => setFormValue(setForm, "notesBase", notesBase)} placeholder="Vanilla, Amber" />
         </div>
 
+        <fieldset className="mt-6 border-t border-border pt-5">
+          <legend className="px-2 text-[12px] font-bold text-muted">Main Accords</legend>
+          <p className="mb-4 text-[12px] leading-6 text-muted">Add scent characteristics and their percentages to show the bars on the product page. Each value is independent; they do not need to total 100%.</p>
+          <datalist id="accord-names">
+            {Object.keys(accordColors).map((name) => <option key={name} value={name} />)}
+          </datalist>
+          <div className="space-y-3">
+            {form.accords.map((accord, index) => (
+              <div key={accord.id} className="grid items-end gap-3 sm:grid-cols-[1fr_150px_auto]">
+                <Field label={`Accord ${index + 1}`} value={accord.name} onChange={(name) => updateAccord(setForm, accord.id, "name", name)} placeholder="Vanilla" list="accord-names" required />
+                <Field label="Percentage (%)" type="number" value={accord.pct} onChange={(pct) => updateAccord(setForm, accord.id, "pct", pct)} placeholder="70" min="0" max="100" step="any" required />
+                <button type="button" aria-label={`Remove accord ${index + 1}`} onClick={() => setForm((previous) => ({ ...previous, accords: previous.accords.filter((item) => item.id !== accord.id) }))} className="rounded-[3px] border border-border px-4 py-3 text-[12px] font-bold text-rose-700">Remove</button>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={() => setForm((previous) => ({ ...previous, accords: [...previous.accords, { id: crypto.randomUUID(), name: "", pct: "" }] }))} className="mt-4 rounded-[3px] border border-border px-4 py-2 text-[12px] font-bold text-ink">Add Accord</button>
+        </fieldset>
+
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onClose} className="rounded-[3px] border border-border px-5 py-3 text-[13px] font-bold text-ink">
             Cancel
@@ -250,11 +287,12 @@ function ProductModal({ editing, form, setForm, error, submitting, onClose, onSu
   )
 }
 
-function Field({ label, value, onChange, placeholder, type = "text", wide = false }) {
+function Field({ label, value, onChange, placeholder, type = "text", wide = false, ...inputProps }) {
   return (
     <label className={wide ? "md:col-span-2" : ""}>
       <span className="mb-2 block text-[12px] font-bold text-muted">{label}</span>
       <input
+        {...inputProps}
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -281,6 +319,13 @@ function Textarea({ label, value, onChange, wide = false }) {
 
 function setFormValue(setForm, field, value) {
   setForm((previous) => ({ ...previous, [field]: value }))
+}
+
+function updateAccord(setForm, id, field, value) {
+  setForm((previous) => ({
+    ...previous,
+    accords: previous.accords.map((accord) => accord.id === id ? { ...accord, [field]: value } : accord),
+  }))
 }
 
 function splitList(value) {

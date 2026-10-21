@@ -145,7 +145,7 @@ router.put("/:slug", requireAuth, requireRole("admin"), async (req, res, next) =
     const product = await Product.findOneAndUpdate(
       { slug: req.params.slug },
       payload,
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     )
 
     if (!product) return res.status(404).json({ message: "Product not found" })
@@ -166,7 +166,7 @@ router.patch("/:slug/stock", requireAuth, requireRole("admin"), async (req, res,
     const product = await Product.findOneAndUpdate(
       { slug: req.params.slug },
       { stock },
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     )
 
     if (!product) return res.status(404).json({ message: "Product not found" })

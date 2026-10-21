@@ -147,7 +147,7 @@ export default function ProductDetail() {
                 <div key={accord.name} className="flex items-center gap-4">
                   <span className="w-20 text-right text-[13px] text-muted">{accord.name}</span>
                   <div className="h-7 flex-1 overflow-hidden rounded-[3px] bg-cream">
-                    <div className="flex h-full items-center px-3 text-[11px] font-bold text-cream" style={{ width: `${accord.pct}%`, backgroundColor: accordColors[accord.name] }}>
+                    <div className="flex h-full items-center px-3 text-[11px] font-bold text-cream" style={{ width: `${accord.pct}%`, backgroundColor: accordColors[accord.name] || "#8b7460" }}>
                       {accord.pct}%
                     </div>
                   </div>

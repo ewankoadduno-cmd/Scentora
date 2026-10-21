@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+import Pagination from "@mui/material/Pagination"
 import ProductCard from "../../components/ProductCard"
 import { SearchIcon } from "../../components/Icons"
 import { useProducts } from "../../hooks/useProducts"
@@ -6,6 +7,7 @@ import { useProducts } from "../../hooks/useProducts"
 const categories = ["Men", "Women", "Unisex"]
 const families = ["Fresh", "Citrus", "Woody", "Amber", "Vanilla", "Oud", "Floral"]
 const sizes = ["50ml", "100ml", "105ml"]
+const productsPerPage = 8
 const priceRanges = [
   { label: "Under ₱1,500", min: "", max: "1499" },
   { label: "₱1,500 - ₱2,000", min: "1500", max: "2000" },
@@ -19,6 +21,7 @@ export default function ProductListing() {
   const [size, setSize] = useState("")
   const [priceRange, setPriceRange] = useState("")
   const [sort, setSort] = useState("newest")
+  const [page, setPage] = useState(1)
   const selectedPriceRange = priceRanges.find((range) => range.label === priceRange)
   const { products, loading } = useProducts({
     search,
@@ -55,6 +58,14 @@ export default function ProductListing() {
   }, [category, family, products, search, selectedPriceRange, size, sort])
 
   const hasFilters = Boolean(search || category || family || size || priceRange)
+  const pageCount = Math.ceil(filtered.length / productsPerPage)
+  const currentPage = pageCount > 0 ? Math.min(page, pageCount) : 1
+  const paginatedProducts = filtered.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage)
+
+  function updateFilter(setter, value) {
+    setter(value)
+    setPage(1)
+  }
 
   function clearFilters() {
     setSearch("")
@@ -62,6 +73,7 @@ export default function ProductListing() {
     setFamily("")
     setSize("")
     setPriceRange("")
+    setPage(1)
   }
 
   return (
@@ -77,7 +89,7 @@ export default function ProductListing() {
             <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-faint" />
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => updateFilter(setSearch, event.target.value)}
               placeholder="Search by name, brand, note, or mood..."
               className="w-full rounded-[4px] border border-border bg-cream py-3 pl-11 pr-4 text-[14px] outline-none transition-colors focus:border-bronze"
             />
@@ -89,10 +101,10 @@ export default function ProductListing() {
         <div className="flex gap-9">
           <aside className="hidden w-[245px] shrink-0 lg:block">
             <div className="sticky top-[86px]">
-              <FilterGroup title="Category" items={categories} value={category} setValue={setCategory} />
-              <FilterGroup title="Fragrance Family" items={families} value={family} setValue={setFamily} />
-              <FilterGroup title="Size" items={sizes} value={size} setValue={setSize} />
-              <FilterGroup title="Price Range" items={priceRanges.map((range) => range.label)} value={priceRange} setValue={setPriceRange} />
+              <FilterGroup title="Category" items={categories} value={category} setValue={(value) => updateFilter(setCategory, value)} />
+              <FilterGroup title="Fragrance Family" items={families} value={family} setValue={(value) => updateFilter(setFamily, value)} />
+              <FilterGroup title="Size" items={sizes} value={size} setValue={(value) => updateFilter(setSize, value)} />
+              <FilterGroup title="Price Range" items={priceRanges.map((range) => range.label)} value={priceRange} setValue={(value) => updateFilter(setPriceRange, value)} />
               <div className="border-t border-border-faint pt-6">
                 <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-faint">Price Range</p>
                 <div className="rounded-[5px] border border-border bg-parchment px-4 py-3 text-[12.5px] text-muted">
@@ -115,7 +127,7 @@ export default function ProductListing() {
               </p>
               <select
                 value={sort}
-                onChange={(event) => setSort(event.target.value)}
+                onChange={(event) => updateFilter(setSort, event.target.value)}
                 className="rounded-[3px] border border-border bg-cream px-3 py-2 text-[12.5px] outline-none focus:border-bronze"
               >
                 <option value="newest">Newest</option>
@@ -124,9 +136,33 @@ export default function ProductListing() {
               </select>
             </div>
             {filtered.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
-                {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
-              </div>
+              <>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                  {paginatedProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+                </div>
+                {pageCount > 1 && (
+                  <div className="mt-9 flex justify-center">
+                    <Pagination
+                      count={pageCount}
+                      page={currentPage}
+                      onChange={(_, value) => setPage(value)}
+                      shape="rounded"
+                      sx={{
+                        "& .MuiPaginationItem-root": {
+                          borderColor: "#d7c5ad",
+                          color: "#70665d",
+                          fontFamily: "inherit",
+                          fontWeight: 700,
+                        },
+                        "& .Mui-selected": {
+                          backgroundColor: "#1c1713 !important",
+                          color: "#f7f1e8",
+                        },
+                      }}
+                    />
+                  </div>
+                )}
+              </>
             ) : (
               <section className="rounded-[6px] border border-border bg-parchment p-8 text-center">
                 <h2 className="font-display text-[32px]">No fragrances found.</h2>

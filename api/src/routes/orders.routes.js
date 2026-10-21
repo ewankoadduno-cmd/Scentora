@@ -133,7 +133,7 @@ router.patch("/:orderNumber/status", requireAuth, requireRole("admin"), async (r
     const order = await Order.findOneAndUpdate(
       { orderNumber: req.params.orderNumber },
       update,
-      { new: true, runValidators: true }
+      { returnDocument: "after", runValidators: true }
     )
 
     if (!order) return res.status(404).json({ message: "Order not found" })
