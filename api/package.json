@@ -2,9 +2,10 @@
   "name": "api",
   "version": "1.0.0",
   "description": "e-commerce backend",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
     "dev": "node app.js",
     "seed:products": "node src/scripts/seedProducts.js",
     "seed:users": "node src/scripts/seedUsers.js"
